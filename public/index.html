@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="広島県バス協会のGTFSリアルタイムを利用した、15秒間隔で更新するバス運行ビューアー。">
+  <title>ひろしま バスライブ</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="brand" href="./"><span class="brand-icon" aria-hidden="true">B</span><span><small>HIROSHIMA · LIVE TRANSIT</small><h1>ひろしま <b>バスライブ</b></h1></span></a>
+    <div class="header-right"><span class="live-indicator"><i id="status-dot"></i><span id="status">接続を確認中</span></span><button id="settings" class="quiet">接続設定</button></div>
+  </header>
+  <main>
+    <aside class="sidebar" aria-label="運行情報">
+      <div class="sidebar-top"><div class="eyebrow">BUS OPERATIONS</div><div class="heading-line"><h2>いま、街を走るバス。</h2><span class="interval">15s</span></div>
+        <p class="intro">公開データから、位置と運行情報を確認。</p>
+        <label class="field-label" for="operator">バス事業者</label><select id="operator"><option value="8">広島電鉄</option></select>
+        <div class="search-wrap"><span aria-hidden="true">⌕</span><input id="search" type="search" aria-label="路線・行先・車両・便IDを検索" placeholder="路線・行先・車両を検索"></div>
+        <div class="stats"><div><strong id="position-count">—</strong><span>位置取得</span></div><div><strong id="delay-count">—</strong><span>3分以上の遅れ</span></div><div><strong id="alert-count">—</strong><span>お知らせ</span></div></div>
+        <div class="filter-line"><label for="filter">表示</label><select id="filter"><option value="all">すべての取得情報</option><option value="position">位置情報あり</option><option value="delay">3分以上の遅れ</option><option value="stale">古い・時刻不明</option></select><button id="pause" class="quiet" aria-pressed="false">一時停止</button></div>
+        <p id="provider-note" class="note"></p>
+      </div>
+      <div id="feed-status" class="feed-status" aria-live="polite"></div>
+      <div class="list-title"><h3>取得した車両・便</h3><span id="result-count">0 件</span></div>
+      <div id="vehicles" class="vehicle-list"><div class="empty">配信データを読み込んでいます…</div></div>
+      <div class="sidebar-bottom"><span id="last-fetch">取得前</span><span id="countdown">更新待機</span></div>
+    </aside>
+    <section class="map-section" aria-label="バスの現在位置の地図">
+      <div id="map"></div>
+      <div id="map-error" class="map-error" hidden>地図を読み込めませんでした。ネットワーク接続を確認してください。車両情報は左の一覧で確認できます。</div>
+      <div class="map-title"><small>広島県 / HIROSHIMA</small><strong>街の動きを、ひと目で。</strong><span id="map-subtitle">表示範囲を拡大すると車両を確認できます</span></div>
+      <button id="fit" class="fit-button">表示中の車両へ移動</button>
+      <div class="legend"><span><i class="legend-dot green"></i>遅れ3分未満</span><span><i class="legend-dot orange"></i>3分以上の遅れ</span><span><i class="legend-dot gray"></i>古い・時刻不明</span><span><i class="legend-dot blue"></i>遅延情報なし</span></div>
+      <div class="coverage">表示台数は、運行中の全車両数ではありません。</div>
+    </section>
+  </main>
+  <section class="alerts-strip" aria-label="運行のお知らせ"><div class="alerts-label">運行のお知らせ</div><div id="alerts">読み込み中…</div></section>
+  <footer><span>非公式サービス · データ提供：<a href="https://www.bus-kyo.or.jp/gtfs-open-data" target="_blank" rel="noopener noreferrer">広島県バス協会 / 各バス事業者</a>（CC0）</span><span>対象外路線・配信中断あり。実際の運行は各社案内をご確認ください。</span></footer>
+</div>
+<dialog id="settings-dialog"><form id="settings-form"><div class="eyebrow">CONNECTION</div><h2>データの接続設定</h2><p>通常はそのまま利用できます。GitHub Pagesに画面を置く場合は、別途起動したデータ取得サーバーのHTTPS URLを指定してください。</p><label for="api-url">データ取得サーバーのURL</label><input id="api-url" type="url" placeholder="空欄：このサイトと同じサーバー"><small>例：https://your-bus-api.example.com<br>APIキーは不要です。一般公開の代理サーバーは使用しません。</small><div id="settings-error" role="alert"></div><div class="dialog-actions"><button id="cancel-settings" type="button" class="quiet">閉じる</button><button type="submit" class="primary">保存して接続</button></div></form></dialog>
+</body>
+</html>
