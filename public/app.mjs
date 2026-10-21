@@ -44,7 +44,7 @@ async function refresh(){
           // Metadata is independent of live positions. Failure must not suppress live vehicles.
           if(!metadata.has(p.id)&&!pendingMeta.has(p.id)){
             pendingMeta.add(p.id);
-            api(`/api/static/${p.id}`,signal).then(m=>{if(token===generation){metadata.set(p.id,{...m,expiresAt:Date.now()+6*3600*1000});render();}})
+            api(`/api/static/${p.id}`,signal).then(m=>{if(token===generation){metadata.set(p.id,{...m,expiresAt:Date.now()+6*3600*1000,...(m.error?{retryAt:Date.now()+60000}:{})});render();}})
               .catch(e=>{if(!signal.aborted&&token===generation){metadata.set(p.id,{error:e.message,retryAt:Date.now()+60000});render();}})
               .finally(()=>pendingMeta.delete(p.id));
           }
